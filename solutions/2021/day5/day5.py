@@ -117,9 +117,8 @@ class Line:
 if __name__ == "__main__":
 
     with open("solutions/2021/day5/input.txt", "r") as f:
-        lines = f.read().splitlines()
+        lines = [Line.from_puzzle_input(line) for line in f.readlines()]
 
-    lines = [Line.from_puzzle_input(line) for line in lines]
     straight_field = np.zeros((1000, 1000), dtype=int)
     diagonal_field = straight_field.copy()
     for line in lines:
