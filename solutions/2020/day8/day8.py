@@ -115,63 +115,64 @@ Fix the program so that it terminates normally by changing exactly one jmp (to n
 
 class InfiniteLoopEncountered(RuntimeError):
     """Program encountered an infinite loop and is shutting down"""
-    pass
+    def __init__(self, message, acc):
+        super().__init__(message)
+        self.acc = acc
 
 
-def execute_line(line: str, tracker: list):
+def execute_line(line: str, tracker: list, line_no: int, acc: int):
     """Execute line and accumulate acc"""
-    global acc, line_no
     tracker[line_no] = True
     match line.split():
         case "acc", value:
-            acc += int(value)
-            line_no += 1
+            return acc + int(value), line_no + 1
         case "jmp", value:
-            line_no += int(value)
+            return acc, line_no + int(value)
         case "nop", value:
-            line_no += 1
+            return acc, line_no + 1
         case _:
-            print(f"No valid action: {line}")
+            raise ValueError(f"No valid action in line: {line}")
 
 
-def run_program(instructions: list[str]) -> tuple[int, int]:
-    """Run program from instructions"""
-    global acc, line_no
+def run_program(instructions: list[str]) -> int:
+    """Run program from instructions and return acc"""
     acc, line_no = 0, 0
     line_tracker = [False] * len(instructions)
-    try:
-        while True:
-            if line_tracker[line_no]:
-                raise InfiniteLoopEncountered()
-            execute_line(instructions[line_no], line_tracker)
-    except InfiniteLoopEncountered:
-        return -1, acc
-    except IndexError:
-        return 0, acc
+    while True:
+        if line_no == len(instructions):
+            return acc
+        if line_tracker[line_no]:
+            raise InfiniteLoopEncountered(f"infinite loop at line {line_no}", acc=acc)
+        acc, line_no = execute_line(instructions[line_no], line_tracker, line_no, acc)
 
 
 if __name__ == "__main__":
 
     with open("solutions/2020/day8/input.txt", "r") as f:
-        program_instructions = f.read().split("\n")[:-1]
+        program_instructions = [*f.read().splitlines()]
 
     mutation_lookup = {"nop": "jmp", "jmp": "nop"}
 
+    try:
+        acc1 = run_program(program_instructions)
+    except InfiniteLoopEncountered as e:
+        acc1 = e.acc
+
     acc2 = None
-    status, acc1 = run_program(program_instructions)
-    change_index = 0
-    while status:
-        original_operation, value = program_instructions[change_index].split()
+    mutation_index = 0
+    while True:
+        original_operation, value = program_instructions[mutation_index].split()
         if original_operation not in mutation_lookup:
-            change_index += 1
+            mutation_index += 1
             continue
         new_operation = mutation_lookup[original_operation]
-        program_instructions[change_index] = program_instructions[change_index].replace(original_operation, new_operation)
-        status, acc2 = run_program(program_instructions)
-        if status == 0:
+        program_instructions[mutation_index] = program_instructions[mutation_index].replace(original_operation, new_operation)
+        try:
+            acc2 = run_program(program_instructions)
             break
-        program_instructions[change_index] = program_instructions[change_index].replace(new_operation, original_operation)
-        change_index += 1
+        except InfiniteLoopEncountered:
+            program_instructions[mutation_index] = program_instructions[mutation_index].replace(new_operation, original_operation)
+            mutation_index += 1
 
     print(f"Answer 1: {acc1}")
     print(f"Answer 2: {acc2}")
