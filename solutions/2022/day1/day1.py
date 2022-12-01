@@ -76,8 +76,8 @@ total?
 if __name__ == "__main__":
 
     with open("solutions/2022/day1/input.txt", "r") as f:
-        calories = [list(map(int, elf_calories.rstrip('\n').split("\n")))
-                    for elf_calories in f.read().split("\n\n")]
+        calories = [list(map(int, elf_calories.split("\n")))
+                    for elf_calories in f.read().rstrip('\n').split("\n\n")]
 
     total_calories_per_elf = [sum(elf_calories) for elf_calories in calories]
     total_calories_per_elf.sort(reverse=True)
