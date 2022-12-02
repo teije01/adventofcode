@@ -71,7 +71,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 
-def calc_score(rpc_1: NDArray[np.int_], rpc_2) -> NDArray[np.int_]:
+def calc_score(rpc_1: NDArray[np.int_], rpc_2: NDArray[np.int_]) -> NDArray[np.int_]:
     """
     compute scores on rock paper scissors game
 
