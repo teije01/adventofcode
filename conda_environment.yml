@@ -7,3 +7,6 @@ dependencies:
 - numpy
 - pandas
 - networkx
+- pip
+- pip:
+    - advent-of-code-data
