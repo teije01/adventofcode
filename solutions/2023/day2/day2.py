@@ -3,6 +3,7 @@ https://adventofcode.com/2023/day/2
 """
 import re
 from dataclasses import dataclass
+from aocd.models import Puzzle
 
 
 @dataclass
@@ -48,20 +49,26 @@ def parse_game(game_line: str) -> Game:
     return game
 
 
-def main():
-    with open("solutions/2023/day2/input.txt", "r") as f:
-        game_lines = f.read().rstrip("\n").split("\n")
-
-    games = [parse_game(game_line) for game_line in game_lines]
+def part_1_and_2(input_data: str) -> tuple[int, int]:
+    games = [parse_game(game_line) for game_line in input_data.split("\n")]
 
     available_cubes = CubeSet(12, 13, 14)
     answer_1 = sum(
         game.game_id for game in games if game.max_cubes_used() in available_cubes
     )
     answer_2 = sum(game.max_cubes_used().product() for game in games)
+    return answer_1, answer_2
 
-    print(f"Solution 1: {answer_1}")
-    print(f"Solution 2: {answer_2}")
+
+def main():
+    puzzle = Puzzle(day=2, year=2023)
+
+    example, = puzzle.examples
+    assert part_1_and_2(example.input_data) == (int(example.answer_a), int(example.answer_b))
+
+    input_data = puzzle.input_data
+    puzzle.answer_a, puzzle.answer_b = part_1_and_2(input_data)
+    print(f"{puzzle.answer_a=}, {puzzle.answer_b=}")
 
 
 if __name__ == "__main__":
