@@ -3,6 +3,7 @@ https://adventofcode.com/2023/day/1
 """
 import re
 
+from aocd.models import Puzzle
 
 DIGIT_MAPPING = {
     "one": "1",
@@ -28,15 +29,29 @@ def derive_calibration_value(input_string, allow_text_digit=False) -> int:
     return calibration_value
 
 
-def main():
-    with open("solutions/2023/day1/input.txt", "r") as f:
-        calibration_document = f.read().rstrip('\n').split("\n")
-
+def part_1(input_data: str) -> int:
+    calibration_document = input_data.split("\n")
     answer_1 = sum(derive_calibration_value(line) for line in calibration_document)
-    answer_2 = sum(derive_calibration_value(line, allow_text_digit=True) for line in calibration_document)
+    return answer_1
 
-    print(f"Solution 1: {answer_1}")
-    print(f"Solution 2: {answer_2}")
+
+def part_2(input_data: str) -> int:
+    calibration_document = input_data.split("\n")
+    answer_2 = sum(derive_calibration_value(line, allow_text_digit=True) for line in calibration_document)
+    return answer_2
+
+
+def main():
+    puzzle = Puzzle(day=1, year=2023)
+
+    example1, example2 = puzzle.examples
+    assert part_1(example1.input_data) == int(example1.answer_a)
+    assert part_2(example2.input_data) == int(example2.answer_b)
+
+    input_data = puzzle.input_data
+    puzzle.answer_a = part_1(puzzle.input_data)
+    puzzle.answer_b = part_2(puzzle.input_data)
+    print(f"{puzzle.answer_a=}, {puzzle.answer_b=}")
 
 
 if __name__ == "__main__":
